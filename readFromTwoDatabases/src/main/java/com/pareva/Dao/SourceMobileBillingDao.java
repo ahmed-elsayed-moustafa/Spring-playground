@@ -14,5 +14,8 @@ public interface SourceMobileBillingDao extends CrudRepository<MobileClubBilling
 	
 	@Query(value = "SELECT m FROM  MobileClubBillingPlan m WHERE aBillingEnd < :date")
     List<MobileClubBillingPlan> findByBillingEnd(@Param("date") String date);
+	
+	//vodacom mtn
+	List<MobileClubBillingPlan> findByNetworkCode(String networkcode);
 
 }

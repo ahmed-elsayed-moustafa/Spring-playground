@@ -11,4 +11,6 @@ import com.pareva.model.MobileClubBillingPlan;
 public interface SourceService extends CrudRepository<MobileClubBillingPlan, String>{
 
 	List<MobileClubBillingPlan> findByBillingEnd(String date);
+	
+	List<MobileClubBillingPlan> findByNetworkCode(String networkcode);
 }

@@ -33,9 +33,19 @@ public class MultipleDBController {
 	   */
 	  @RequestMapping("/count")
 	  public String databases() {
-	  return output.count()+"  "+ sm.count() +" "+output.findAll();
+	  return output.count()+"  "+ sm.count();
 	  }
 	
+	  
+	  @RequestMapping("/vodacom")
+	  public String vodacomm() {
+	  return sm.findByNetworkCode("vodacom").toString();
+	  }
+	  
+	  @RequestMapping("/mtn")
+	  public String mtn() {
+	  return sm.findByNetworkCode("mtn").toString();
+	  }
 	  
 	  /**
 	   * In the SourceBillingDao i use a query to get all elements after a the date passed in

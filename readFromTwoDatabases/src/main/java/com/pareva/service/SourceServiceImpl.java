@@ -75,4 +75,9 @@ public class SourceServiceImpl implements SourceService {
 	public List<MobileClubBillingPlan> findByBillingEnd(String date) {
 		return dao.findByBillingEnd(date);
 	}
+
+	@Override
+	public List<MobileClubBillingPlan> findByNetworkCode(String networkcode) {
+		return dao.findByNetworkCode(networkcode);
+	}
 }
