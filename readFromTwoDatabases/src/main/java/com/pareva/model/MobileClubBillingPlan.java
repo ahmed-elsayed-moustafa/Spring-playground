@@ -5,9 +5,12 @@ import java.util.Date;
 import javax.persistence.*;
 @Entity
 @Table(name="mobileClubBillingPlans")
+//dont need to tell it table
 @NamedQueries(value= {
-	      @NamedQuery(name="MobileClubBillingPlan.findByNetworkCode", query="SELECT m FROM MobileClubBillingPlan m WHERE m.networkCode = ?1"),
+	      @NamedQuery(name="MobileClubBillingPlan.findByNetworkCode", query="from MobileClubBillingPlan where networkCode = ?1"),
 })
+//normal SQL
+//@NamedNativeQuery(name="", query="", resultClass=MobileClubBillingPlan.class)
 public class MobileClubBillingPlan implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
