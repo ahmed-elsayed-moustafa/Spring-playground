@@ -3,9 +3,11 @@ package com.pareva.model;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.*;
-
 @Entity
 @Table(name="mobileClubBillingPlans")
+@NamedQueries(value= {
+	      @NamedQuery(name="MobileClubBillingPlan.findByNetworkCode", query="SELECT m FROM MobileClubBillingPlan m WHERE m.networkCode = ?1"),
+})
 public class MobileClubBillingPlan implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
