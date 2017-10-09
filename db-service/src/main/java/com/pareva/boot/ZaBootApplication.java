@@ -27,4 +27,5 @@ public class ZaBootApplication {
 	public SessionFactory sessionFactory(HibernateEntityManagerFactory hemf) {
 	    return hemf.getSessionFactory();
 	}
+
 }

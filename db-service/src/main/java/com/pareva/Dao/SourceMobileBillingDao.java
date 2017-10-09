@@ -63,22 +63,21 @@ public class SourceMobileBillingDao implements Dao {
 		
 		Map<String, List> resultMap = new HashMap<String, List>();
 
-		for (Map<String, Object> m : returnedList) {
-
-			for (String key : m.keySet()) {
-
-				if (!resultMap.containsKey(key)) {
-					List list = new ArrayList();
-					list.add(m.get(key));
-					resultMap.put(key, list);
-				} else {
-					List basedOnKey = resultMap.get(key);
-					basedOnKey.add(m.get(key));
-				}
-			}
+		returnedList.stream().forEach(x-> x.keySet().stream().forEach(y->{
+		
+		        if(!resultMap.containsKey(y)) {
+		        	    List list = new ArrayList();
+					list.add(x.get(y));
+					resultMap.put(y, list);
+		        }else {
+		          	List basedOnKey = resultMap.get(y);
+					basedOnKey.add(x.get(y));
+					resultMap.put(y, basedOnKey);
+		        }
+		}));		
+		   return resultMap;
 		}
-		return resultMap;
-	}
+		
 
 	public JdbcTemplate getSourceJdbcTemplate() {
 		return sourceJdbcTemplate;
