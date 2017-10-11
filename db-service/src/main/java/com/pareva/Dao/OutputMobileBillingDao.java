@@ -52,10 +52,6 @@ public class OutputMobileBillingDao implements Dao {
 		return map != null ? addArgumentstoQuery(result, map).uniqueResult() : result.uniqueResult();
 	}
 
-	public Object select(String query) {
-		return select(query, null);
-	}
-
 	// used by me for testing
 	public long count() {
 		BigInteger b = (BigInteger) getSessionFactory().getCurrentSession()
