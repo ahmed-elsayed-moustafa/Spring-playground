@@ -39,10 +39,6 @@ public class OutputMobileBillingDao implements Dao {
 		return changed;
 	}
 	
-	public Integer update(String updateQuery) {
-		return update(updateQuery, null);
-	}
-
 	public Query addArgumentstoQuery(Query query, Map<String, Object> map) {
 		for (String keys : map.keySet()) {
 			query.setParameter(keys, map.get(keys));
