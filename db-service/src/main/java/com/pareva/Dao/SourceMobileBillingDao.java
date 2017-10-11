@@ -1,26 +1,31 @@
 package com.pareva.Dao;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 
 @Repository
 public class SourceMobileBillingDao implements Dao {
 
 	@Autowired
+	@Qualifier("sourceNamedJdbcTemplate")
+	private NamedParameterJdbcTemplate namedJdbcTemplate;
+	
+	@Autowired
 	@Qualifier("sourceJdbcTemplate")
-	private JdbcTemplate sourceJdbcTemplate;
+	private  JdbcTemplate sourceJdbcTemplate;
+	
+	//private NamedParameterJdbcTemplate namedJdbcTemplate;
 
 	/**
-	 * This method takes the argument of String query and any optional
-	 * arguments(arguments is optional , you dont need to write it) and returns a
+	 * This method takes the argument of Map and returns a
 	 * List of maps
 	 * 
 	 * @param query
@@ -29,9 +34,8 @@ public class SourceMobileBillingDao implements Dao {
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public List select(String query, String... arguments) {
-		return arguments.length > 0 ? getSourceJdbcTemplate().queryForList(query, arguments)
-				: getSourceJdbcTemplate().queryForList(query);
+	public List select(String query, Map map) {
+		return map==null ? getSourceJdbcTemplate().queryForList(query):getNamedSourceJdbcTemplate().queryForList(query,map);
 	}
 
 	/**
@@ -45,40 +49,40 @@ public class SourceMobileBillingDao implements Dao {
 	 * 
 	 * String...arguments is completely optional and you dont need to write
 	 * anything, calling the method with
-	 * 
-	 * formatResultOFQuery("query", "1", "2"...) or formatResultOFQuery("query") are
-	 * both legal the one on the left is used for query with arguments like SELECT
-	 * DISTINCT aParsedMobile AS mobile FROM mobileClubBillingPlans WHERE
-	 * aNetworkCode = ? the above query can be dine as follows
-	 * formatResultOFQuery("SELECT DISTINCT aParsedMobile AS mobile FROM
-	 * mobileClubBillingPlans WHERE aNetworkCode = ?","vodacom")
-	 * 
+	 *
+	 *Using the Namedparamater :name you can replace it directly with the mapped value
+	 *stored in a Map. 
 	 * @param query
 	 * @param arguments
 	 * @return
 	 */
-	public Object formatResultOFQuery(String query, String... arguments) {
+	public Object formatResultOFQuery(String query, Map map) {
 
-		List<Map<String, Object>> returnedList = select(query, arguments);
-		
+		List<Map<String, Object>> returnedList = select(query, map);
+
 		Map<String, List> resultMap = new HashMap<String, List>();
 
-		returnedList.stream().forEach(x-> x.keySet().stream().forEach(y->{
-		
-		        if(!resultMap.containsKey(y)) {
-		        	    List list = new ArrayList();
-					list.add(x.get(y));
-					resultMap.put(y, list);
-		        }else {
-		          	List basedOnKey = resultMap.get(y);
-					basedOnKey.add(x.get(y));
-					resultMap.put(y, basedOnKey);
-		        }
-		}));		
-		   return resultMap;
-		}
-		
+		returnedList.stream().forEach(x -> x.keySet().stream().forEach(y -> add(resultMap, x, y)));
 
+		return resultMap;
+	}
+	
+	public void add(Map<String, List> map, Map<String, Object> maps, String key) {
+		if (!map.containsKey(key)) {
+			List list = new ArrayList<String>();
+			list.add(maps.get(key).toString());
+			map.put(key, list);
+		} else {
+			List basedOnKey = map.get(key);
+			basedOnKey.add(maps.get(key).toString());
+			map.put(key, basedOnKey);
+		}
+	}
+
+	public NamedParameterJdbcTemplate getNamedSourceJdbcTemplate() {
+		return namedJdbcTemplate;
+	}
+	
 	public JdbcTemplate getSourceJdbcTemplate() {
 		return sourceJdbcTemplate;
 	}

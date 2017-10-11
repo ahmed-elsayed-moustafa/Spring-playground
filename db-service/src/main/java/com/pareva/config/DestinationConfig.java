@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
 public class DestinationConfig {
@@ -29,10 +30,14 @@ public class DestinationConfig {
 	public DataSource sourceDataSource() {
 		return DataSourceBuilder.create().build();
 	}
-
+	
+	@Bean(name = "sourceNamedJdbcTemplate")
+	public NamedParameterJdbcTemplate sourceNamedJdbcTemplate(@Qualifier("sourceDb") DataSource destinationDb) {
+		return new NamedParameterJdbcTemplate(destinationDb);
+	}
+	
 	@Bean(name = "sourceJdbcTemplate")
-	public JdbcTemplate sourceJdbcTemplate(@Qualifier("sourceDb") DataSource destinationDb) {
+	public  JdbcTemplate sourceJdbcTemplate(@Qualifier("sourceDb") DataSource destinationDb) {
 		return new JdbcTemplate(destinationDb);
 	}
-
 }

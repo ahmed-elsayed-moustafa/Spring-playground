@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @SpringBootApplication
 @Configuration
 @EnableAutoConfiguration 
 @ComponentScan(basePackages = {"com.pareva.controller"})
-@EntityScan(basePackages= {"com.pareva.Dao"})
 @EnableJpaRepositories("com.pareva.Dao")
 public class ZaBootApplication {
 
