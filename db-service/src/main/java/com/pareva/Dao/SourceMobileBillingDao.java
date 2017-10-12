@@ -6,27 +6,27 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
+@ComponentScan(basePackages = { "com.pareva.config" })
 public class SourceMobileBillingDao implements Dao {
 
 	@Autowired
 	@Qualifier("sourceNamedJdbcTemplate")
 	private NamedParameterJdbcTemplate namedJdbcTemplate;
-	
+
 	@Autowired
 	@Qualifier("sourceJdbcTemplate")
-	private  JdbcTemplate sourceJdbcTemplate;
-	
-	//private NamedParameterJdbcTemplate namedJdbcTemplate;
+	private JdbcTemplate sourceJdbcTemplate;
+
+	// private NamedParameterJdbcTemplate namedJdbcTemplate;
 
 	/**
-	 * This method takes the argument of Map and returns a
-	 * List of maps
+	 * This method takes the argument of Map and returns a List of maps
 	 * 
 	 * @param query
 	 * @param mapper
@@ -35,7 +35,8 @@ public class SourceMobileBillingDao implements Dao {
 	 * @throws JsonProcessingException
 	 */
 	public List select(String query, Map map) {
-		return map==null ? getSourceJdbcTemplate().queryForList(query):getNamedSourceJdbcTemplate().queryForList(query,map);
+		return map == null ? getSourceJdbcTemplate().queryForList(query)
+				: getNamedSourceJdbcTemplate().queryForList(query, map);
 	}
 
 	/**
@@ -50,8 +51,9 @@ public class SourceMobileBillingDao implements Dao {
 	 * String...arguments is completely optional and you dont need to write
 	 * anything, calling the method with
 	 *
-	 *Using the Namedparamater :name you can replace it directly with the mapped value
-	 *stored in a Map. 
+	 * Using the Namedparamater :name you can replace it directly with the mapped
+	 * value stored in a Map.
+	 * 
 	 * @param query
 	 * @param arguments
 	 * @return
@@ -66,23 +68,16 @@ public class SourceMobileBillingDao implements Dao {
 
 		return resultMap;
 	}
-	
-	public void add(Map<String, List> map, Map<String, Object> maps, String key) {
-		if (!map.containsKey(key)) {
-			List list = new ArrayList<String>();
-			list.add(maps.get(key).toString());
-			map.put(key, list);
-		} else {
-			List basedOnKey = map.get(key);
-			basedOnKey.add(maps.get(key).toString());
-			map.put(key, basedOnKey);
-		}
+
+	public void add(Map<String, List> map, Map<String, Object> listMaps, String key) {
+	     map.computeIfAbsent(key, k -> new ArrayList<>()).add((listMaps.get(key)));
 	}
+	
 
 	public NamedParameterJdbcTemplate getNamedSourceJdbcTemplate() {
 		return namedJdbcTemplate;
 	}
-	
+
 	public JdbcTemplate getSourceJdbcTemplate() {
 		return sourceJdbcTemplate;
 	}
