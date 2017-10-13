@@ -48,8 +48,10 @@ public class SourceMobileBillingDao implements Dao {
 	 * I created my own map of String(key) and List Objects which will map the key
 	 * with all the returned values so it looks better.
 	 * 
-	 * String...arguments is completely optional and you dont need to write
-	 * anything, calling the method with
+	 * The map is completely optional and if you want to use native queries you can
+	 * using the map you can name any arguments and pass in a hashmap of these arguments as key and 
+	 * mapped to the value you desire to pass to the query like in the link  below
+	 * {@link https://dzone.com/tutorials/java/spring/spring-named-parameter-jdbc-template.html}
 	 *
 	 * Using the Namedparamater :name you can replace it directly with the mapped
 	 * value stored in a Map.
@@ -69,6 +71,17 @@ public class SourceMobileBillingDao implements Dao {
 		return resultMap;
 	}
 
+	
+	/**
+	 * You can take advantage of the fact that the add(element) 
+	 * method will return true if the set didn't contain the specified element. 
+	 * If this call returns false, it means the element wasn't added because 
+	 * it was already present. Therefore, you can use it for this case.
+	 * {@link: https://stackoverflow.com/questions/37277814/redesigning-method-to-use-java-8-map-computeifabsent-with-thrown-exception}
+	 * @param map
+	 * @param listMaps
+	 * @param key
+	 */
 	public void add(Map<String, List> map, Map<String, Object> listMaps, String key) {
 	     map.computeIfAbsent(key, k -> new ArrayList<>()).add((listMaps.get(key)));
 	}
