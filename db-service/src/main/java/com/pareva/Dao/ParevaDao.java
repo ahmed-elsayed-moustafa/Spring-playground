@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @ComponentScan(basePackages = { "com.pareva.config" })
-public class OutputMobileBillingDao implements Dao {
+public class ParevaDao implements Dao {
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -38,7 +38,7 @@ public class OutputMobileBillingDao implements Dao {
 		}
 		return changed;
 	}
-	
+
 	public Query addArgumentstoQuery(Query query, Map<String, Object> map) {
 		for (String keys : map.keySet()) {
 			query.setParameter(keys, map.get(keys));

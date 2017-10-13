@@ -1,39 +1,26 @@
 package com.pareva.controller;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.SessionFactory;
-import org.hibernate.jpa.HibernateEntityManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Configuration;
+import com.pareva.Dao.LocalDbDao;
+import com.pareva.Dao.ParevaDao;
 
-import com.pareva.Dao.*;
-
-@RestController
+@Configuration 
 @ComponentScan(basePackages = { "com.pareva.Dao" })
-public class MultipleDBController {
+public class DbTableSelector {
 
-	protected final Logger logger = LogManager.getLogger(MultipleDBController.class.getName());
-
-	@Autowired
-	OutputMobileBillingDao out;
+	protected final Logger logger = LogManager.getLogger(this.getClass().getName());
 
 	@Autowired
-	SourceMobileBillingDao source;
+	ParevaDao pareva;
+
+	@Autowired
+	LocalDbDao local;
 
 	/**
 	 *Using overloading, you can insert query, Mapped arguments (NamedJDBCTemplate) and the flag
@@ -45,9 +32,9 @@ public class MultipleDBController {
 	 * @return
 	 */
 	public Object selectTableByQuery(String query, Map map, String flag) {
-		if(flag!=null && flag.equalsIgnoreCase("master")) return out.select(query, map);
-		return query.toLowerCase().startsWith("select") ? source.formatResultOFQuery(query,map)
-				: out.update(query,map);
+		if(flag!=null && flag.equalsIgnoreCase("master")) return pareva.select(query, map);
+		return query.toLowerCase().startsWith("select") ? local.formatResultOFQuery(query,map)
+				: pareva.update(query,map);
 	}
 	
 	/**
@@ -84,13 +71,5 @@ public class MultipleDBController {
 	 */
 	public Object selectTableByQuery(String query) {
 		return selectTableByQuery(query,null,null);
-	}
-	
-	
-	@RequestMapping(value="/test")
-	public Object test() {
-		Map map= new HashMap();
-		map.put("aNetworkCode", "vodacom");
-		return selectTableByQuery("select count(*) from mobileClubBillingPlans WHERE aNetworkCode =:aNetworkCode", map,"Master");
 	}
 }

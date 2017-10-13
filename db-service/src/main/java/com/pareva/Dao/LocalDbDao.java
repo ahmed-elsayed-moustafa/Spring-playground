@@ -1,11 +1,8 @@
 package com.pareva.Dao;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,11 +10,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.mchange.v1.util.SimpleMapEntry;
-
 @Repository
 @ComponentScan(basePackages = { "com.pareva.config" })
-public class SourceMobileBillingDao implements Dao {
+public class LocalDbDao implements Dao {
 
 	@Autowired
 	@Qualifier("sourceNamedJdbcTemplate")
