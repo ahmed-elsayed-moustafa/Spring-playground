@@ -4,12 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import com.mchange.v1.util.SimpleMapEntry;
 
 @Repository
 @ComponentScan(basePackages = { "com.pareva.config" })
@@ -56,6 +60,38 @@ public class SourceMobileBillingDao implements Dao {
 	 * Using the Namedparamater :name you can replace it directly with the mapped
 	 * value stored in a Map.
 	 * 
+	 * Obtain a Stream<Map<String, Objects>> from the mapList.
+	 * 
+	 * Apply the flatMap operator, which roughly maps a stream into 
+	 * an already existing stream.Here: I convert all Map<String, Object> 
+	 * to Stream<Map.Entry<Integer, String>> and add them to the existing stream, 
+	 * thus now it is also of type Stream<Map.Entry<String, Object>>.
+	 * 
+	 * I intend to collect the Stream<Map.Entry<String, Object>> into a Map<String, List<Object>>.
+	 * 
+	 * For this I will use a Collectors.groupingBy, which produces a 
+	 * Map<K, List<V>> based on a grouping function, a Function that 
+	 * maps the Map.Entry<String, Object> to an String in this case.
+	 * 
+	 * For this I use a method reference, which exactly does what I want, 
+	 * namely Map.Entry::getKey, it operates on a Map.Entry and returns an String.
+	 * 
+	 * At this point I would have had a Map<String, List<Map.Entry<String, Object>>> 
+	 * if I had not done any extra processing.
+	 * 
+	 * To ensure that I get the correct signature, 
+	 * I must add a downstream to the Collectors.groupingBy, which has to provide a collector.
+	 * 
+	 * For this downstream I use a collector 
+	 * that maps my Map.Entry entries to their String values via the reference Map.Entry::getValue.
+	 * 
+	 * I also need to specify how they are being collected, 
+	 * which is just a Collectors.toList() here, as I want to add them to a list. 
+	 * 
+	 * And this is how we get a Map<String, List<Object>>.
+	 * 
+	 * {@link: https://stackoverflow.com/questions/22527149/create-a-map-from-a-list-of-maps}
+	 * 
 	 * @param query
 	 * @param arguments
 	 * @return
@@ -64,28 +100,20 @@ public class SourceMobileBillingDao implements Dao {
 
 		List<Map<String, Object>> returnedList = select(query, map);
 
-		Map<String, List> resultMap = new HashMap<String, List>();
-
-		returnedList.stream().forEach(x -> x.keySet().stream().forEach(y -> add(resultMap, x, y)));
-
+		Map<Object, List<Object>> resultMap = returnedList.stream()
+	            .flatMap(m -> m.entrySet().stream())
+	            .collect(
+	                    Collectors.groupingBy(
+	                            Map.Entry::getKey, 
+	                            Collectors.mapping(
+	                                    Map.Entry::getValue, 
+	                                    Collectors.toList()
+	                            )
+	                    )
+	            );
+		
 		return resultMap;
 	}
-
-	
-	/**
-	 * You can take advantage of the fact that the add(element) 
-	 * method will return true if the set didn't contain the specified element. 
-	 * If this call returns false, it means the element wasn't added because 
-	 * it was already present. Therefore, you can use it for this case.
-	 * {@link: https://stackoverflow.com/questions/37277814/redesigning-method-to-use-java-8-map-computeifabsent-with-thrown-exception}
-	 * @param map
-	 * @param listMaps
-	 * @param key
-	 */
-	public void add(Map<String, List> map, Map<String, Object> listMaps, String key) {
-	     map.computeIfAbsent(key, k -> new ArrayList<>()).add((listMaps.get(key)));
-	}
-	
 
 	public NamedParameterJdbcTemplate getNamedSourceJdbcTemplate() {
 		return namedJdbcTemplate;
