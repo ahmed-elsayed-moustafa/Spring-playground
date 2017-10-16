@@ -1,6 +1,5 @@
 package com.pareva.Dao;
 
-import java.math.BigInteger;
 import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -19,46 +18,30 @@ public class ParevaDao implements Dao {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	public Integer update(String updateQuery, Map map) {
-		int changed = 0;
-		Session session = null;
-		try {
-			session = openSession();
-			Transaction tx = session.beginTransaction();
-			Query query = session.createSQLQuery(updateQuery);
-			query = map != null ? addArgumentstoQuery(query, map) : query;
-			changed = query.executeUpdate();
-			tx.commit();
-		} catch (Exception ex) {
-			logger.fatal("ERROR WHILE {} ", ex.getMessage());
-			logger.fatal("QUERY: " + updateQuery);
-			changed = -1;
-		} finally {
-			session.close();
-		}
+	@Override
+	public Integer update(String query, Map map) {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+		Query result = session.createSQLQuery(query);
+		Integer changed = map != null ? addArgumentsToQuery(result, map).executeUpdate() : result.executeUpdate();
+		tx.commit();
 		return changed;
 	}
 
-	public Query addArgumentstoQuery(Query query, Map<String, Object> map) {
+	public Query addArgumentsToQuery(Query query, Map<String, Object> map) {
 		for (String keys : map.keySet()) {
 			query.setParameter(keys, map.get(keys));
 		}
 		return query;
 	}
-
-	public Object select(String query, Map<String, Object> map) {
+	
+	@Override
+	public Object select(String query, Map map) {
 		Session session = openSession();
 		Query result = session.createSQLQuery(query);
-		return map != null ? addArgumentstoQuery(result, map).uniqueResult() : result.uniqueResult();
+		return map != null ? addArgumentsToQuery(result, map).uniqueResult() : result.uniqueResult();
 	}
-
-	// used by me for testing
-	public long count() {
-		BigInteger b = (BigInteger) getSessionFactory().getCurrentSession()
-				.createSQLQuery("select count(*) from mobileClubBillingPlans").uniqueResult();
-		return b.longValue();
-	}
-
+	
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
